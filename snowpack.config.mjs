@@ -28,6 +28,7 @@ export default {
     /* ... */
   },
   buildOptions: {
-    /* ... */
+    out: '/public',
+    metaUrlPath: 'snowpack',
   },
 };
