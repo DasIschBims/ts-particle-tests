@@ -1,9 +1,9 @@
-console.log('Hello World!');
-
+const body = document.querySelector("body") as HTMLBodyElement;
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 const particleArray: Particle[] = [];
 let hue = 0;
+let inCanvas = false;
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -21,28 +21,60 @@ const mouse = {
 canvas.addEventListener('mousemove', (e) => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
-  particleArray.push(new Particle(0, 0, 'rainbow', 0, { x: 0, y: 0 }));
+  particleArray.push(new Particle({ x: mouse.x, y: mouse.y }, 'rainbow', { min: 5, max: 15 }, { velocityX: 2, velocityY: 2 }));
+});
+
+canvas.addEventListener('click', () => {
+  for (let i = 0; i < 10; i++) {
+    particleArray.push(new Particle({ x: mouse.x, y: mouse.y }, 'rainbow', { min: 5, max: 15 }, { velocityX: 2, velocityY: 2 }));
+  }
+});
+
+canvas.addEventListener('mouseout', () => {
+  setInterval(() => {
+    mouse.x = Math.random() * canvas.width;
+    mouse.y = Math.random() * canvas.height;
+  }, 5000);
+  for (let i = 0; i < 25; i++) {
+    setInterval(() => {
+      particleArray.push(new Particle({ x: Math.random() * canvas.width, y: Math.random() * canvas.height }, 'rainbow', { min: 9, max: 10 }, { velocityX: 0.5, velocityY: 0.5 }));
+    }, 5000);
+  }
+});
+
+body.addEventListener('mouseenter', () => {
+  inCanvas = true;
+});
+
+body.addEventListener('mouseout', () => {
+  inCanvas = false;
 });
 
 class Particle {
+  size: any;
   constructor(
-    public x: number,
-    public y: number,
+    public position: { x: number; y: number },
     public color: string,
-    public size: number,
-    public velocity: { x: number; y: number }
+    public sizeObj: { min: number; max: number },
+    public velocity: { velocityX: number; velocityY: number }
   ) {
-    this.x = mouse.x;
-    this.y = mouse.y;
+    this.position.x = position.x;
+    this.position.y = position.y;
     this.color = "#" + color;
-    this.size = Math.random() * 15 + 2;
-    this.velocity = { x: Math.random() * 2 - 1, y: Math.random() * 2 - 1 };
+    this.size = Math.floor(Math.random() * (sizeObj.max - sizeObj.min) + sizeObj.min);
+    this.velocity = { velocityX: (Math.random() * this.velocity.velocityX) - (this.velocity.velocityX / 2), velocityY: (Math.random() * this.velocity.velocityY) - (this.velocity.velocityY / 2) };
   }
 
   update() {
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
-    if (this.size > 0.2) this.size -= 0.15;
+    this.position.x += this.velocity.velocityX;
+    this.position.y += this.velocity.velocityY;
+    if (this.size > 0.2) this.size -= 0.1;
+    if (this.position.x < 0 || this.position.x > canvas.width || this.position.y < 0 || this.position.y > canvas.height) {
+      this.position.x = mouse.x;
+      this.position.y = mouse.y;
+      this.size = Math.floor(Math.random() * (this.sizeObj.max - this.sizeObj.min) + this.sizeObj.min);
+      this.velocity = { velocityX: (Math.random() * this.velocity.velocityX) - (this.velocity.velocityX / 2), velocityY: (Math.random() * this.velocity.velocityY) - (this.velocity.velocityY / 2) };
+    }
   }
 
   draw() {
@@ -56,7 +88,7 @@ class Particle {
     }
     ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.arc(this.position.x, this.position.y, this.size, 0, Math.PI * 2);
     ctx.fill();
   }
 }
