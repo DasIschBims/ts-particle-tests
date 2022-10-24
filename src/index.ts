@@ -34,11 +34,11 @@ canvas.addEventListener('mouseout', () => {
   setInterval(() => {
     mouse.x = Math.random() * canvas.width;
     mouse.y = Math.random() * canvas.height;
-  }, 5000);
+  }, 3000);
   for (let i = 0; i < 25; i++) {
     setInterval(() => {
       particleArray.push(new Particle({ x: Math.random() * canvas.width, y: Math.random() * canvas.height }, 'rainbow', { min: 9, max: 10 }, { velocityX: 0.5, velocityY: 0.5 }));
-    }, 5000);
+    }, 3000);
   }
 });
 
