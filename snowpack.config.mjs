@@ -28,7 +28,8 @@ export default {
     /* ... */
   },
   buildOptions: {
-    out: '/docs',
+    out: './docs',
     metaUrlPath: 'snowpack',
+    baseUrl: '/ts-particle-tests',
   },
 };

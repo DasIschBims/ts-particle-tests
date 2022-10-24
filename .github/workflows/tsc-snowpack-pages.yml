@@ -16,7 +16,6 @@ jobs:
         with:
           node-version: 16.x
       - run: ls -la
-      - run: mkdir -p docs
       - run: npm ci
       - run: npm run build
       - name: Committing changes
