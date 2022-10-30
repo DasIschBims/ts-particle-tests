@@ -9,9 +9,45 @@
       content="Web site created using create-snowpack-app"
     />
     <link rel="stylesheet" type="text/css" href="./index.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&amp;display=swap"
+      rel="stylesheet"
+    />
     <title>Snowpack App</title>
   </head>
   <body>
+    <div id="settings">
+      <input id="settings-toggle" type="checkbox" />
+      <label id="settings-label" for="settings-toggle"><span></span></label>
+
+      <ul id="settings-box">
+        <li id="title">Color</li>
+        <div id="color-settings">
+          <input type="color" id="color-picker" />
+          <span
+            ><input type="checkbox" id="rainbow-toggle" checked />Rainbow</span
+          >
+        </div>
+        <span class="seperator"></span>
+        <li id="title">Size</li>
+        <div id="size-settings">
+          <span>Min</span>
+          <input type="range" id="min-size" min="1" max="50" value="5" />
+          <span>Max</span>
+          <input type="range" id="max-size" min="1" max="50" value="15" />
+        </div>
+        <span class="seperator"></span>
+        <li id="title">Velocity</li>
+        <div id="velocity-settings">
+          <span>Velocity X</span>
+          <input type="range" id="velocity-x" min="1" max="20" value="2" />
+          <span>Velocity Y</span>
+          <input type="range" id="velocity-y" min="1" max="20" value="2" />
+        </div>
+        <span class="seperator"></span>
+        <li id="title">This menu doesn't work yet! ;)</li>
+      </ul>
+    </div>
     <canvas id="canvas"></canvas>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script type="module" src="./dist/index.js"></script>

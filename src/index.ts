@@ -1,9 +1,13 @@
 const body = document.querySelector("body") as HTMLBodyElement;
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+const settingsToggle = document.getElementById('settings-toggle') as HTMLInputElement;
 const particleArray: Particle[] = [];
 let hue = 0;
-let inCanvas = false;
+
+window.onload = () => {
+  settingsToggle.checked = true;
+}
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -30,24 +34,12 @@ canvas.addEventListener('click', () => {
   }
 });
 
-canvas.addEventListener('mouseout', () => {
-  setInterval(() => {
-    mouse.x = Math.random() * canvas.width;
-    mouse.y = Math.random() * canvas.height;
-  }, 3000);
-  for (let i = 0; i < 25; i++) {
-    setInterval(() => {
-      particleArray.push(new Particle({ x: Math.random() * canvas.width, y: Math.random() * canvas.height }, 'rainbow', { min: 9, max: 10 }, { velocityX: 0.5, velocityY: 0.5 }));
-    }, 3000);
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    for (let i = 0; i < 100; i++) {
+      particleArray.push(new Particle({ x: Math.random() * canvas.width, y: Math.random() * canvas.height }, 'rainbow', { min: 5, max: 15 }, { velocityX: 2, velocityY: 2 }));
+    }
   }
-});
-
-body.addEventListener('mouseenter', () => {
-  inCanvas = true;
-});
-
-body.addEventListener('mouseout', () => {
-  inCanvas = false;
 });
 
 class Particle {
@@ -69,12 +61,6 @@ class Particle {
     this.position.x += this.velocity.velocityX;
     this.position.y += this.velocity.velocityY;
     if (this.size > 0.2) this.size -= 0.1;
-    if (this.position.x < 0 || this.position.x > canvas.width || this.position.y < 0 || this.position.y > canvas.height) {
-      this.position.x = mouse.x;
-      this.position.y = mouse.y;
-      this.size = Math.floor(Math.random() * (this.sizeObj.max - this.sizeObj.min) + this.sizeObj.min);
-      this.velocity = { velocityX: (Math.random() * this.velocity.velocityX) - (this.velocity.velocityX / 2), velocityY: (Math.random() * this.velocity.velocityY) - (this.velocity.velocityY / 2) };
-    }
   }
 
   draw() {
