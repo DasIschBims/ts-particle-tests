@@ -140,10 +140,6 @@ label {
   background-color: #121212;
 }
 
-#rainbow-toggle {
-  margin-right: 10px;
-}
-
 #size-settings {
   display: flex;
   align-items: center;
@@ -180,7 +176,7 @@ label {
   align-content: center;
 }
 
-#clear-toggle {
+.toggle {
   margin-right: 10px;
 }
 

@@ -20,6 +20,8 @@ const particleShapeTriangle = document.getElementById('triangle-input') as HTMLI
 const particleShapeStar = document.getElementById('star-input') as HTMLInputElement;
 
 const generalClearCanvas = document.getElementById('clear-toggle') as HTMLInputElement;
+const generalTrail = document.getElementById('trail-toggle') as HTMLInputElement;
+const generalClick = document.getElementById('click-toggle') as HTMLInputElement;
 
 // function wait(time: number) {
 //   return new Promise<void>((resolve) => {
@@ -47,6 +49,8 @@ const settings = {
   shape: 'circle',
   general: {
     clearCanvas: true,
+    trail: true,
+    click: true,
   },
 };
 
@@ -88,6 +92,8 @@ function updateSettings() {
     settings.shape = 'star';
   }
   settings.general.clearCanvas = generalClearCanvas.checked;
+  settings.general.trail = generalTrail.checked;
+  settings.general.click = generalClick.checked;
 }
 
 function resizeCanvas() {
@@ -106,12 +112,16 @@ const mouse = {
 canvas.addEventListener('mousemove', (e) => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
-  particleArray.push(new Particle({ x: mouse.x, y: mouse.y }, settings.color, { min: settings.size.min, max: settings.size.max }, { velocityX: settings.velocity.x, velocityY: settings.velocity.y }, settings.shape));
+  if (settings.general.trail) {
+    particleArray.push(new Particle({ x: mouse.x, y: mouse.y }, settings.color, { min: settings.size.min, max: settings.size.max }, { velocityX: settings.velocity.x, velocityY: settings.velocity.y }, settings.shape));
+  }
 });
 
 canvas.addEventListener('click', () => {
-  for (let i = 0; i < 10; i++) {
-    particleArray.push(new Particle({ x: mouse.x, y: mouse.y }, settings.color, { min: settings.size.min, max: settings.size.max }, { velocityX: settings.velocity.x, velocityY: settings.velocity.y }, settings.shape));
+  if (settings.general.click) {
+    for (let i = 0; i < 10; i++) {
+      particleArray.push(new Particle({ x: mouse.x, y: mouse.y }, settings.color, { min: settings.size.min, max: settings.size.max }, { velocityX: settings.velocity.x, velocityY: settings.velocity.y }, settings.shape));
+    }
   }
 });
 
@@ -169,7 +179,7 @@ class Particle {
         ctx.fill();
         break;
       case 'square':
-        ctx.fillRect(this.position.x, this.position.y, this.size * 1.5, this.size * 1.5);
+        ctx.fillRect(this.position.x - this.size, this.position.y - this.size, this.size * 2, this.size * 2);
         break;
       case 'triangle':
         ctx.beginPath();
