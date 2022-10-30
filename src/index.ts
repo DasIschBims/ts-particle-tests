@@ -14,7 +14,6 @@ const particleYVelocityElement = document.getElementById('velocity-y') as HTMLIn
 
 
 window.onload = () => {
-  settingsToggle.checked = true;
   colorPickerElement.defaultValue = settings.color;
 }
 
