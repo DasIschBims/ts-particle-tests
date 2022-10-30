@@ -61,8 +61,12 @@ window.addEventListener("keydown", (e) => {
       particleArray.push(new Particle({x: Math.random() * canvas.width, y: Math.random() * canvas.height}, settings.color, {min: settings.size.min, max: settings.size.max}, {velocityX: settings.velocity.x, velocityY: settings.velocity.y}));
     }
   }
-  if (e.code === "F2") {
+  if (e.code === "Digit1") {
     settingsToggle.checked = !settingsToggle.checked;
+  }
+  if (e.code === "Digit2") {
+    particleArray.splice(0, particleArray.length);
+    console.log("%cCleared particles", "color: cyan");
   }
 });
 class Particle {
