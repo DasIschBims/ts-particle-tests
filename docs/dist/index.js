@@ -15,6 +15,8 @@ const particleShapeSquare = document.getElementById("square-input");
 const particleShapeTriangle = document.getElementById("triangle-input");
 const particleShapeStar = document.getElementById("star-input");
 const generalClearCanvas = document.getElementById("clear-toggle");
+const generalTrail = document.getElementById("trail-toggle");
+const generalClick = document.getElementById("click-toggle");
 window.onload = () => {
   colorPickerElement.defaultValue = "#ffffff";
   settingsToggle.checked = true;
@@ -31,7 +33,9 @@ const settings = {
   },
   shape: "circle",
   general: {
-    clearCanvas: true
+    clearCanvas: true,
+    trail: true,
+    click: true
   }
 };
 switch (settings.shape) {
@@ -71,6 +75,8 @@ function updateSettings() {
     settings.shape = "star";
   }
   settings.general.clearCanvas = generalClearCanvas.checked;
+  settings.general.trail = generalTrail.checked;
+  settings.general.click = generalClick.checked;
 }
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -85,11 +91,15 @@ const mouse = {
 canvas.addEventListener("mousemove", (e) => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
-  particleArray.push(new Particle({x: mouse.x, y: mouse.y}, settings.color, {min: settings.size.min, max: settings.size.max}, {velocityX: settings.velocity.x, velocityY: settings.velocity.y}, settings.shape));
+  if (settings.general.trail) {
+    particleArray.push(new Particle({x: mouse.x, y: mouse.y}, settings.color, {min: settings.size.min, max: settings.size.max}, {velocityX: settings.velocity.x, velocityY: settings.velocity.y}, settings.shape));
+  }
 });
 canvas.addEventListener("click", () => {
-  for (let i = 0; i < 10; i++) {
-    particleArray.push(new Particle({x: mouse.x, y: mouse.y}, settings.color, {min: settings.size.min, max: settings.size.max}, {velocityX: settings.velocity.x, velocityY: settings.velocity.y}, settings.shape));
+  if (settings.general.click) {
+    for (let i = 0; i < 10; i++) {
+      particleArray.push(new Particle({x: mouse.x, y: mouse.y}, settings.color, {min: settings.size.min, max: settings.size.max}, {velocityX: settings.velocity.x, velocityY: settings.velocity.y}, settings.shape));
+    }
   }
 });
 window.addEventListener("keydown", (e) => {
@@ -140,7 +150,7 @@ class Particle {
         ctx.fill();
         break;
       case "square":
-        ctx.fillRect(this.position.x, this.position.y, this.size * 1.5, this.size * 1.5);
+        ctx.fillRect(this.position.x - this.size, this.position.y - this.size, this.size * 2, this.size * 2);
         break;
       case "triangle":
         ctx.beginPath();
