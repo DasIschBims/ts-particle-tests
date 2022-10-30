@@ -1,21 +1,12 @@
-name: Snowpack
+name: Build and Deploy
 on:
   push:
     branches: [main]
 
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: 'pages'
-  cancel-in-progress: true
-
+  
 jobs:
-  build-pages:
+  snowpack-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -33,7 +24,7 @@ jobs:
           author_email: actions@github.com
 
   build:
-    needs: build-pages
+    needs: snowpack-build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,7 +34,7 @@ jobs:
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
-          source: ./
+          source: ./docs
           destination: ./_site
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
@@ -53,6 +44,12 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pages: write
+    concurrency:
+      group: 'pages'
     needs: build
     steps:
       - name: Deploy to GitHub Pages
