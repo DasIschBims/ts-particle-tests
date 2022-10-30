@@ -73,8 +73,13 @@ window.addEventListener('keydown', (e) => {
     }
   }
 
-  if (e.code === "F2") {
+  if (e.code === 'Digit1') {
     settingsToggle.checked = !settingsToggle.checked;
+  }
+
+  if (e.code === 'Digit2') {
+    particleArray.splice(0, particleArray.length);
+    console.log('%cCleared particles', 'color: cyan');
   }
 });
 
