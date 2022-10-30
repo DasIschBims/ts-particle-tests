@@ -14,6 +14,10 @@ canvas {
   width: 100vw;
 }
 
+*::-webkit-scrollbar {
+  width: 0px;
+}
+
 #settings {
   height: 0;
 }
@@ -72,6 +76,7 @@ canvas {
   font-family: 'DM Sans', sans-serif;
   box-shadow: 0 0 20px rgba(0, 0, 0, 1);
   transition: all 0.2s ease;
+  overflow: auto;
 }
 
 #settings-toggle:checked ~ #settings-label > span {
