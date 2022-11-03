@@ -3,6 +3,7 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const settingsToggle = document.getElementById("settings-toggle");
 const particleArray = [];
+const fpsCounter = document.getElementById("fps-counter");
 let hue = 0;
 const colorPickerElement = document.getElementById("color-picker");
 const rainbowColorInputElement = document.getElementById("rainbow-toggle");
@@ -17,27 +18,96 @@ const particleShapeStar = document.getElementById("star-input");
 const generalClearCanvas = document.getElementById("clear-toggle");
 const generalTrail = document.getElementById("trail-toggle");
 const generalClick = document.getElementById("click-toggle");
+const generalFPS = document.getElementById("fps-toggle");
 window.onload = () => {
   colorPickerElement.defaultValue = "#ffffff";
   settingsToggle.checked = true;
 };
-const settings = {
-  color: "rainbow",
-  size: {
-    min: 5,
-    max: 15
-  },
-  velocity: {
-    x: 2,
-    y: 2
-  },
-  shape: "circle",
-  general: {
-    clearCanvas: true,
-    trail: true,
-    click: true
+let settings;
+if (localStorage.getItem("settings") === null) {
+  settings = {
+    color: "#ffffff",
+    size: {
+      min: 1,
+      max: 2
+    },
+    velocity: {
+      x: 1,
+      y: 1
+    },
+    shape: "circle",
+    general: {
+      clearCanvas: true,
+      trail: true,
+      click: true,
+      fps: true
+    }
+  };
+  console.log("No settings found, setting default settings");
+  console.log(settings);
+  localStorage.setItem("settings", JSON.stringify(settings));
+} else {
+  console.log("Settings found, loading settings");
+  console.log(JSON.parse(localStorage.getItem("settings")));
+  settings = JSON.parse(localStorage.getItem("settings"));
+}
+function getShape() {
+  if (particleShapeCircle.checked) {
+    return "circle";
+  } else if (particleShapeSquare.checked) {
+    return "square";
+  } else if (particleShapeTriangle.checked) {
+    return "triangle";
+  } else if (particleShapeStar.checked) {
+    return "star";
+  } else {
+    return "circle";
   }
-};
+}
+function updateSettings() {
+  settings = {
+    color: colorPickerElement.value,
+    size: {
+      min: parseInt(particleMinSizeElement.value),
+      max: parseInt(particleMaxSizeElement.value)
+    },
+    velocity: {
+      x: parseInt(particleXVelocityElement.value),
+      y: parseInt(particleYVelocityElement.value)
+    },
+    shape: getShape(),
+    general: {
+      clearCanvas: generalClearCanvas.checked,
+      trail: generalTrail.checked,
+      click: generalClick.checked,
+      fps: generalFPS.checked
+    }
+  };
+  localStorage.setItem("settings", JSON.stringify(settings));
+}
+function setSettings() {
+  colorPickerElement.value = settings.color;
+  particleMinSizeElement.value = settings.size.min.toString();
+  particleMaxSizeElement.value = settings.size.max.toString();
+  particleXVelocityElement.value = settings.velocity.x.toString();
+  particleYVelocityElement.value = settings.velocity.y.toString();
+  generalClearCanvas.checked = settings.general.clearCanvas;
+  generalTrail.checked = settings.general.trail;
+  generalClick.checked = settings.general.click;
+  generalFPS.checked = settings.general.fps;
+  if (settings.shape === "circle") {
+    particleShapeCircle.checked = true;
+  }
+  if (settings.shape === "square") {
+    particleShapeSquare.checked = true;
+  }
+  if (settings.shape === "triangle") {
+    particleShapeTriangle.checked = true;
+  }
+  if (settings.shape === "star") {
+    particleShapeStar.checked = true;
+  }
+}
 switch (settings.shape) {
   case "circle":
     particleShapeCircle.checked = true;
@@ -51,32 +121,6 @@ switch (settings.shape) {
   case "star":
     particleShapeStar.checked = true;
     break;
-}
-function updateSettings() {
-  if (rainbowColorInputElement.checked) {
-    settings.color = "rainbow";
-  } else {
-    settings.color = colorPickerElement.value;
-  }
-  settings.size.min = parseInt(particleMinSizeElement.value);
-  settings.size.max = parseInt(particleMaxSizeElement.value);
-  settings.velocity.x = parseInt(particleXVelocityElement.value);
-  settings.velocity.y = parseInt(particleYVelocityElement.value);
-  if (particleShapeCircle.checked) {
-    settings.shape = "circle";
-  }
-  if (particleShapeSquare.checked) {
-    settings.shape = "square";
-  }
-  if (particleShapeTriangle.checked) {
-    settings.shape = "triangle";
-  }
-  if (particleShapeStar.checked) {
-    settings.shape = "star";
-  }
-  settings.general.clearCanvas = generalClearCanvas.checked;
-  settings.general.trail = generalTrail.checked;
-  settings.general.click = generalClick.checked;
 }
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -138,7 +182,7 @@ class Particle {
       this.size -= 0.1;
   }
   draw() {
-    if (this.color === "rainbow") {
+    if (rainbowColorInputElement.checked) {
       ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
     } else {
       ctx.fillStyle = this.color;
@@ -188,14 +232,31 @@ function handleParticles() {
     }
   }
 }
+let fpsCounterNumber;
+const times = [];
+let init = 0;
 function update() {
-  if (settings.general.clearCanvas) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-  handleParticles();
-  hue += 0.25;
   requestAnimationFrame(update);
   updateSettings();
+  if (generalFPS.checked) {
+    window.requestAnimationFrame(() => {
+      const now = performance.now();
+      while (times.length > 0 && times[0] <= now - 1e3) {
+        times.shift();
+      }
+      times.push(now);
+      fpsCounterNumber = times.length;
+      fpsCounter.innerText = `${fpsCounterNumber} FPS`;
+    });
+  } else {
+    fpsCounter.innerText = "";
+  }
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  handleParticles();
+  if (rainbowColorInputElement.checked) {
+    hue += 0.25;
+  }
 }
+setSettings();
 update();
 export {};
