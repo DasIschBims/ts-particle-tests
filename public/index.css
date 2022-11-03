@@ -186,6 +186,16 @@ label {
   margin-bottom: 30px;
 }
 
+#fps-counter {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  user-select: none;
+}
+
 .toggle {
   margin-right: 10px;
 }

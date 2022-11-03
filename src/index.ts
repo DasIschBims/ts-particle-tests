@@ -3,6 +3,7 @@ const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 const settingsToggle = document.getElementById('settings-toggle') as HTMLInputElement;
 const particleArray: Particle[] = [];
+const fpsCounter = document.getElementById("fps-counter") as HTMLSpanElement;
 let hue = 0;
 
 const colorPickerElement = document.getElementById('color-picker') as HTMLInputElement;
@@ -22,6 +23,7 @@ const particleShapeStar = document.getElementById('star-input') as HTMLInputElem
 const generalClearCanvas = document.getElementById('clear-toggle') as HTMLInputElement;
 const generalTrail = document.getElementById('trail-toggle') as HTMLInputElement;
 const generalClick = document.getElementById('click-toggle') as HTMLInputElement;
+const generalFPS = document.getElementById('fps-toggle') as HTMLInputElement;
 
 // function wait(time: number) {
 //   return new Promise<void>((resolve) => {
@@ -36,23 +38,114 @@ window.onload = () => {
   settingsToggle.checked = true;
 }
 
-const settings = {
-  color: 'rainbow',
+type settingsType = {
+  color: string;
   size: {
-    min: 5,
-    max: 15,
-  },
+    min: number;
+    max: number;
+  };
   velocity: {
-    x: 2,
-    y: 2,
-  },
-  shape: 'circle',
+    x: number;
+    y: number;
+  };
+  shape: string;
   general: {
-    clearCanvas: true,
-    trail: true,
-    click: true,
-  },
+    clearCanvas: boolean;
+    trail: boolean;
+    click: boolean;
+    fps: boolean;
+  };
 };
+
+let settings: settingsType;
+
+if (localStorage.getItem('settings') === null) {
+  settings = {
+    color: "#ffffff",
+    size: {
+      min: 1,
+      max: 2,
+    },
+    velocity: {
+      x: 1,
+      y: 1,
+    },
+    shape: "circle",
+    general: {
+      clearCanvas: true,
+      trail: true,
+      click: true,
+      fps: true,
+    },
+  };
+  console.log("No settings found, setting default settings");
+  console.log(settings);
+  localStorage.setItem('settings', JSON.stringify(settings));
+} else {
+  console.log("Settings found, loading settings");
+  console.log(JSON.parse(localStorage.getItem('settings') as string));
+  settings = JSON.parse(localStorage.getItem('settings') as string);
+}
+
+function getShape() {
+  if (particleShapeCircle.checked) {
+    return "circle";
+  } else if (particleShapeSquare.checked) {
+    return "square";
+  } else if (particleShapeTriangle.checked) {
+    return "triangle";
+  } else if (particleShapeStar.checked) {
+    return "star";
+  } else {
+    return "circle";
+  }
+}
+
+function updateSettings() {
+  settings = {
+    color: colorPickerElement.value,
+    size: {
+      min: parseInt(particleMinSizeElement.value),
+      max: parseInt(particleMaxSizeElement.value),
+    },
+    velocity: {
+      x: parseInt(particleXVelocityElement.value),
+      y: parseInt(particleYVelocityElement.value),
+    },
+    shape: getShape(),
+    general: {
+      clearCanvas: generalClearCanvas.checked,
+      trail: generalTrail.checked,
+      click: generalClick.checked,
+      fps: generalFPS.checked,
+    },
+  }
+  localStorage.setItem('settings', JSON.stringify(settings));
+}
+
+function setSettings() {
+  colorPickerElement.value = settings.color;
+  particleMinSizeElement.value = settings.size.min.toString();
+  particleMaxSizeElement.value = settings.size.max.toString();
+  particleXVelocityElement.value = settings.velocity.x.toString();
+  particleYVelocityElement.value = settings.velocity.y.toString();
+  generalClearCanvas.checked = settings.general.clearCanvas;
+  generalTrail.checked = settings.general.trail;
+  generalClick.checked = settings.general.click;
+  generalFPS.checked = settings.general.fps;
+  if (settings.shape === "circle") {
+    particleShapeCircle.checked = true;
+  }
+  if (settings.shape === "square") {
+    particleShapeSquare.checked = true;
+  }
+  if (settings.shape === "triangle") {
+    particleShapeTriangle.checked = true;
+  }
+  if (settings.shape === "star") {
+    particleShapeStar.checked = true;
+  }
+}
 
 switch (settings.shape) {
   case 'circle':
@@ -67,33 +160,6 @@ switch (settings.shape) {
   case 'star':
     particleShapeStar.checked = true;
     break;
-}
-
-function updateSettings() {
-  if (rainbowColorInputElement.checked) {
-    settings.color = 'rainbow';
-  } else {
-    settings.color = colorPickerElement.value;
-  }
-  settings.size.min = parseInt(particleMinSizeElement.value);
-  settings.size.max = parseInt(particleMaxSizeElement.value);
-  settings.velocity.x = parseInt(particleXVelocityElement.value);
-  settings.velocity.y = parseInt(particleYVelocityElement.value);
-  if (particleShapeCircle.checked) {
-    settings.shape = 'circle';
-  }
-  if (particleShapeSquare.checked) {
-    settings.shape = 'square';
-  }
-  if (particleShapeTriangle.checked) {
-    settings.shape = 'triangle';
-  }
-  if (particleShapeStar.checked) {
-    settings.shape = 'star';
-  }
-  settings.general.clearCanvas = generalClearCanvas.checked;
-  settings.general.trail = generalTrail.checked;
-  settings.general.click = generalClick.checked;
 }
 
 function resizeCanvas() {
@@ -167,7 +233,7 @@ class Particle {
   }
 
   draw() {
-    if (this.color === 'rainbow') {
+    if (rainbowColorInputElement.checked) {
       ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
     } else {
       ctx.fillStyle = this.color;
@@ -219,15 +285,38 @@ function handleParticles() {
   }
 }
 
+let fpsCounterNumber: number;
+const times: number[] = [];
+
+let init: number = 0;
+
 function update() {
-  if (settings.general.clearCanvas) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-  handleParticles();
-  hue += 0.25;
   requestAnimationFrame(update);
   updateSettings();
+
+  if (generalFPS.checked) {
+    window.requestAnimationFrame(() => {
+      const now = performance.now();
+      while (times.length > 0 && times[0] <= now - 1000) {
+        times.shift();
+      }
+      times.push(now);
+      fpsCounterNumber = times.length;
+      fpsCounter.innerText = `${fpsCounterNumber} FPS`;
+    });
+  } else {
+    fpsCounter.innerText = '';
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  handleParticles();
+  if (rainbowColorInputElement.checked) {
+    hue += 0.25;
+  }
 }
+
+setSettings();
+
 update();
 
 export { };
