@@ -251,7 +251,9 @@ function update() {
   } else {
     fpsCounter.innerText = "";
   }
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (settings.general.clearCanvas) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
   handleParticles();
   if (rainbowColorInputElement.checked) {
     hue += 0.25;
