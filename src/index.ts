@@ -1,4 +1,3 @@
-const body = document.querySelector('body') as HTMLBodyElement;
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 const settingsToggle = document.getElementById('settings-toggle') as HTMLInputElement;
@@ -24,14 +23,6 @@ const generalClearCanvas = document.getElementById('clear-toggle') as HTMLInputE
 const generalTrail = document.getElementById('trail-toggle') as HTMLInputElement;
 const generalClick = document.getElementById('click-toggle') as HTMLInputElement;
 const generalFPS = document.getElementById('fps-toggle') as HTMLInputElement;
-
-// function wait(time: number) {
-//   return new Promise<void>((resolve) => {
-//     setTimeout(() => {
-//       resolve();
-//     }, time);
-//   });
-// }
 
 window.onload = () => {
   colorPickerElement.defaultValue = "#ffffff";
@@ -133,6 +124,7 @@ function setSettings() {
   generalTrail.checked = settings.general.trail;
   generalClick.checked = settings.general.click;
   generalFPS.checked = settings.general.fps;
+
   if (settings.shape === "circle") {
     particleShapeCircle.checked = true;
   }
@@ -287,8 +279,6 @@ function handleParticles() {
 
 let fpsCounterNumber: number;
 const times: number[] = [];
-
-let init: number = 0;
 
 function update() {
   requestAnimationFrame(update);
