@@ -1,4 +1,3 @@
-const body = document.querySelector("body");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const settingsToggle = document.getElementById("settings-toggle");
@@ -234,7 +233,6 @@ function handleParticles() {
 }
 let fpsCounterNumber;
 const times = [];
-let init = 0;
 function update() {
   requestAnimationFrame(update);
   updateSettings();
